@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% load tz %}
+
+{% block title %}SQM Brasil — Notícias{% endblock %}
+
+{% block content %}
+  <!-- HERO -->
+  <section class="relative overflow-hidden rounded-2xl border bg-gradient-to-br from-brand/10 via-emerald-50 to-white p-8 mb-10">
+    <div class="max-w-3xl">
+      <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900">
+        Bem-vindo ao <span class="text-brand">SQM Brasil</span>
+      </h1>
+      <p class="mt-3 text-gray-700 text-lg">
+        Portal de notícias, orientação e comunidade sobre Sensibilidade Química Múltipla.
+      </p>
+      <div class="mt-6 flex gap-3">
+        <a href="/accounts/signup/" class="px-4 py-2 rounded-md bg-brand text-white hover:bg-brand-dark">
+          Participar da comunidade
+        </a>
+        <a href="#noticias" class="px-4 py-2 rounded-md border hover:bg-gray-50">
+          Ver notícias
+        </a>
+      </div>
+    </div>
+    <div class="pointer-events-none absolute -right-10 -top-10 h-48 w-48 rounded-full bg-brand/20 blur-2xl"></div>
+  </section>
+
+  <!-- LISTAGEM -->
+  <h2 id="noticias" class="mb-4 text-xl font-semibold text-gray-800">Notícias e Artigos</h2>
+
+  {% if posts %}
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      {% for p in posts %}
+        <article class="group bg-white rounded-2xl border shadow-sm overflow-hidden hover:shadow-md transition">
+          {% if p.cover %}
+            <a href="{% url 'post_detail' slug=p.slug %}">
+              <img src="{{ p.cover.url }}" alt="{{ p.title }}" class="w-full h-44 object-cover">
+            </a>
+          {% endif %}
+          <div class="p-5">
+            <h3 class="text-lg font-semibold leading-tight">
+              <a href="{% url 'post_detail' slug=p.slug %}" class="hover:text-brand">{{ p.title }}</a>
+            </h3>
+            {% if p.summary %}
+              <p class="mt-2 text-sm text-gray-600">{{ p.summary }}</p>
+            {% endif %}
+            <div class="mt-3 text-xs text-gray-500">
+              Publicado em {{ p.created_at|localtime|date:"d/m/Y H:i" }}
+            </div>
+          </div>
+        </article>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="bg-white border rounded-xl p-8 text-center text-gray-600">
+      Ainda não há posts publicados.
+    </div>
+  {% endif %}
+{% endblock %}

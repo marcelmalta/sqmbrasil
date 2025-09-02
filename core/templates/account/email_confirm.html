@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}Confirmar e-mail — SQM Brasil{% endblock %}
+{% block content %}
+<div class="max-w-md mx-auto bg-white border rounded-2xl p-6 text-center shadow">
+  <h1 class="text-2xl font-bold mb-4">Confirmar e-mail</h1>
+  <form method="post" action="{% url 'account_confirm_email' confirmation.key %}">
+    {% csrf_token %}
+    <button type="submit" class="px-4 py-2 rounded-md bg-brand text-white hover:bg-brand-dark">
+      Confirmar
+    </button>
+  </form>
+</div>
+{% endblock %}

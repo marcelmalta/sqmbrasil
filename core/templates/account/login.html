@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+
+{% block title %}Entrar — SQM Brasil{% endblock %}
+{% block content %}
+<div class="max-w-md mx-auto bg-white border rounded-2xl p-6 shadow">
+  <h1 class="text-2xl font-bold mb-4">Entrar</h1>
+  <form method="post" action="{% url 'account_login' %}" class="space-y-4">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    <div>
+      <label class="block text-sm mb-1">E-mail</label>
+      {{ form.login|add_class:"w-full rounded-md border px-3 py-2" }}
+    </div>
+    <div>
+      <label class="block text-sm mb-1">Senha</label>
+      {{ form.password|add_class:"w-full rounded-md border px-3 py-2" }}
+    </div>
+    <div class="flex justify-between text-sm">
+      <a href="{% url 'account_reset_password' %}" class="text-brand hover:underline">Esqueci minha senha</a>
+    </div>
+    <button type="submit" class="w-full rounded-md bg-brand text-white py-2 hover:bg-brand-dark">Entrar</button>
+  </form>
+  <p class="mt-4 text-sm text-gray-600">Não tem conta?
+    <a href="{% url 'account_signup' %}" class="text-brand hover:underline">Cadastre-se</a>
+  </p>
+</div>
+{% endblock %}

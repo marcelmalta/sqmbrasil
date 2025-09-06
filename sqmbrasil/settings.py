@@ -1,10 +1,16 @@
 from pathlib import Path
+import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-coloque-uma-chave-segura-aqui'
-DEBUG = True
-ALLOWED_HOSTS = []
+# Segurança: chave secreta vem do ambiente em produção
+SECRET_KEY = os.environ.get("SECRET_KEY", "dev-secret-key")
+
+# DEBUG controlado por variável de ambiente
+DEBUG = os.environ.get("DEBUG", "True") == "True"
+
+# Hosts permitidos (lista separada por vírgulas)
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "127.0.0.1,localhost").split(",")
 
 INSTALLED_APPS = [
     # Django
@@ -92,6 +98,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / "static"]
+STATIC_ROOT = BASE_DIR / "staticfiles"  # usado no deploy (collectstatic)
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
@@ -112,7 +119,7 @@ ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/"
 
-# E-mails (no console por enquanto)
+# E-mails (no console em dev)
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 DEFAULT_FROM_EMAIL = "no-reply@sqmbrasil.com"
 

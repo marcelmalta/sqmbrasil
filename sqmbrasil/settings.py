@@ -139,6 +139,10 @@ else:
     MEDIA_URL = "/media/"
     MEDIA_ROOT = BASE_DIR / "media"
 
+print(">>> DEBUG =", DEBUG)
+print(">>> USE_S3 =", USE_S3)
+print(">>> MEDIA_URL =", MEDIA_URL)
+
 # Backends + políticas do allauth
 AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",

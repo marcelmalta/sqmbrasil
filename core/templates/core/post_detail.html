@@ -25,6 +25,48 @@
       {{ post.content|linebreaks }}
     </div>
 
+    <!-- Ações: Curtir e Compartilhar -->
+    <div class="mt-6 flex items-center gap-4">
+      <form method="post" action="{% url 'like_post' post.id %}">
+        {% csrf_token %}
+        <button type="submit" class="px-3 py-1 rounded-md border {% if user_liked %}bg-red-500 text-white{% else %}hover:bg-gray-100{% endif %}">
+          ❤️ Curtir ({{ post.likes_count }})
+        </button>
+      </form>
+
+      <!-- Compartilhar -->
+      <div class="flex gap-2 text-sm">
+        <a href="https://wa.me/?text={{ request.build_absolute_uri }}" target="_blank" class="text-green-600">WhatsApp</a>
+        <a href="https://twitter.com/intent/tweet?url={{ request.build_absolute_uri }}" target="_blank" class="text-sky-500">Twitter</a>
+        <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}" target="_blank" class="text-blue-700">Facebook</a>
+      </div>
+    </div>
+
+    <!-- Comentários -->
+    <section class="mt-10">
+      <h2 class="text-xl font-semibold mb-4">Comentários</h2>
+
+      {% if user.is_authenticated %}
+        <form method="post" class="mb-6">
+          {% csrf_token %}
+          <textarea name="comment" rows="3" class="w-full border rounded-md p-2" placeholder="Escreva um comentário..."></textarea>
+          <button type="submit" class="mt-2 px-4 py-2 bg-brand text-white rounded-md">Publicar</button>
+        </form>
+      {% else %}
+        <p class="text-gray-600">Faça login para comentar.</p>
+      {% endif %}
+
+      {% for c in comments %}
+        <div class="mb-4 border-b pb-2">
+          <p class="text-sm text-gray-800"><strong>{{ c.user.username }}</strong> disse:</p>
+          <p class="text-gray-700">{{ c.content }}</p>
+          <span class="text-xs text-gray-500">{{ c.created_at|localtime|date:"d/m/Y H:i" }}</span>
+        </div>
+      {% empty %}
+        <p class="text-gray-500">Ainda não há comentários.</p>
+      {% endfor %}
+    </section>
+
     <div class="mt-8">
       <a href="/" class="inline-flex items-center text-green-600 hover:underline">&larr; Voltar</a>
     </div>

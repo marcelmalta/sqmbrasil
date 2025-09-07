@@ -134,14 +134,10 @@ if USE_S3:
     AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY")
     AWS_STORAGE_BUCKET_NAME = os.environ.get("AWS_STORAGE_BUCKET_NAME")
     AWS_S3_ENDPOINT_URL = os.environ.get("AWS_S3_ENDPOINT_URL")
-    MEDIA_URL = f"{AWS_S3_ENDPOINT_URL}/{AWS_STORAGE_BUCKET_NAME}/"
+    MEDIA_URL = "https://media.sqmbrasil.com.br/"
 else:
     MEDIA_URL = "/media/"
     MEDIA_ROOT = BASE_DIR / "media"
-
-print(">>> DEBUG =", DEBUG)
-print(">>> USE_S3 =", USE_S3)
-print(">>> MEDIA_URL =", MEDIA_URL)
 
 # Backends + políticas do allauth
 AUTHENTICATION_BACKENDS = [

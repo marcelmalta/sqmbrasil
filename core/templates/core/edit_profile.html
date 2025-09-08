@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+
+{% block title %}Editar perfil — SQM Brasil{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto bg-white border rounded-2xl p-6">
+  <h1 class="text-2xl font-semibold mb-4">Editar perfil</h1>
+
+  <form method="post" enctype="multipart/form-data" class="space-y-4">
+    {% csrf_token %}
+
+    <div>
+      <label class="block text-sm font-medium mb-1">Nome de usuário</label>
+      {{ form.username|add_class:"w-full border rounded-md p-2" }}
+      <p class="text-xs text-gray-500 mt-1">Use apenas letras, números, ponto (.), underline (_) e hífen (-). 3–20 caracteres.</p>
+      {% if form.username.errors %}
+        <ul class="mt-1 text-xs text-red-600">
+          {% for e in form.username.errors %}
+            <li>{{ e }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium mb-1">Foto de perfil</label>
+      <input type="file" name="avatar" accept="image/*"
+             class="w-full border rounded-md p-2 file:mr-3 file:py-1 file:px-3 file:rounded-md file:border-0 file:bg-brand file:text-white hover:file:bg-brand-dark">
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium mb-1">Bio</label>
+      {{ form.bio|add_class:"w-full border rounded-md p-2" }}
+      <p class="text-xs text-gray-500 mt-1">Dica: fale brevemente sobre sua experiência com SQM.</p>
+      {% if form.bio.errors %}
+        <ul class="mt-1 text-xs text-red-600">
+          {% for e in form.bio.errors %}
+            <li>{{ e }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    </div>
+
+    <div class="pt-2">
+      <button class="px-4 py-2 bg-brand text-white rounded-md hover:bg-brand-dark">Salvar</button>
+      <a href="{% url 'profile' request.user.username %}" class="ml-2 px-4 py-2 border rounded-md hover:bg-gray-50">Cancelar</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

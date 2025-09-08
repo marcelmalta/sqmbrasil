@@ -8,7 +8,6 @@
   <!-- Tailwind via CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
-    // ajustes rápidos de tema (opcional)
     tailwind.config = {
       theme: {
         extend: {
@@ -29,16 +28,23 @@
 
       <nav class="flex items-center gap-3 text-sm">
         <a href="/" class="px-3 py-2 rounded-md hover:bg-gray-100">Início</a>
+        <a href="{% url 'profiles_list' %}" class="px-3 py-2 rounded-md hover:bg-gray-100">Comunidade</a>
 
         {% if user.is_authenticated %}
           <span class="hidden sm:inline text-gray-300">|</span>
           <span class="hidden sm:inline text-gray-600">Olá, {{ user.email|default:user.get_username }}</span>
-          <a href="/accounts/logout/" class="px-3 py-2 rounded-md bg-gray-900 text-white hover:bg-gray-800">
+
+          <!-- Botão Meu Perfil -->
+          <a href="{% url 'profile' username=user.username %}" class="px-3 py-2 rounded-md hover:bg-gray-100">
+            Meu Perfil
+          </a>
+
+          <a href="{% url 'account_logout' %}" class="px-3 py-2 rounded-md bg-gray-900 text-white hover:bg-gray-800">
             Sair
           </a>
         {% else %}
-          <a href="/accounts/login/" class="px-3 py-2 rounded-md hover:bg-gray-100">Entrar</a>
-          <a href="/accounts/signup/" class="px-3 py-2 rounded-md bg-brand text-white hover:bg-brand-dark">
+          <a href="{% url 'account_login' %}" class="px-3 py-2 rounded-md hover:bg-gray-100">Entrar</a>
+          <a href="{% url 'account_signup' %}" class="px-3 py-2 rounded-md bg-brand text-white hover:bg-brand-dark">
             Cadastrar
           </a>
         {% endif %}
@@ -51,10 +57,18 @@
     {% if messages %}
       <div class="mb-6 space-y-2">
         {% for message in messages %}
-          <div class="px-4 py-3 rounded-lg border
-            {% if message.tags == 'success' %}bg-green-50 border-green-200 text-green-800
-            {% elif message.tags == 'error' %}bg-red-50 border-red-200 text-red-800
-            {% else %}bg-gray-50 border-gray-200 text-gray-800{% endif %}">
+          <div class="px-4 py-3 rounded-lg border text-sm font-medium
+            {% if message.tags == 'success' %}
+              bg-green-50 border-green-200 text-green-800
+            {% elif message.tags == 'error' %}
+              bg-red-50 border-red-200 text-red-800
+            {% elif message.tags == 'warning' %}
+              bg-yellow-50 border-yellow-200 text-yellow-800
+            {% elif message.tags == 'info' %}
+              bg-blue-50 border-blue-200 text-blue-800
+            {% else %}
+              bg-gray-50 border-gray-200 text-gray-800
+            {% endif %}">
             {{ message }}
           </div>
         {% endfor %}
@@ -65,8 +79,12 @@
   </main>
 
   <footer class="border-t bg-white">
-    <div class="max-w-6xl mx-auto px-4 py-8 text-sm text-gray-500">
-      © {{ now|date:"Y" }} SQM Brasil — Conteúdo e comunidade sobre Sensibilidade Química Múltipla
+    <div class="max-w-6xl mx-auto px-4 py-8 text-sm text-gray-500 flex flex-col sm:flex-row items-center justify-between gap-3">
+      <span>© {{ now|date:"Y" }} SQM Brasil — Conteúdo e comunidade sobre Sensibilidade Química Múltipla</span>
+      <nav class="flex gap-4 text-sm">
+        <a href="/" class="hover:text-brand">Início</a>
+        <a href="{% url 'profiles_list' %}" class="hover:text-brand">Comunidade</a>
+      </nav>
     </div>
   </footer>
 </body>

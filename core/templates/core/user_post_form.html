@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+
+{% block title %}Nova postagem — SQM Brasil{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto bg-white border rounded-2xl p-6">
+  <h1 class="text-2xl font-semibold mb-1">Nova postagem</h1>
+  <p class="text-sm text-gray-500 mb-4">Você pode publicar 1 postagem por dia.</p>
+
+  <form method="post" enctype="multipart/form-data" class="space-y-4">
+    {% csrf_token %}
+
+    <div>
+      <label class="block text-sm font-medium mb-1">Título</label>
+      {{ form.title|add_class:"w-full border rounded-md p-2" }}
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium mb-1">Conteúdo</label>
+      {{ form.content|add_class:"w-full border rounded-md p-2 min-h-[120px]" }}
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium mb-1">Imagem (opcional)</label>
+      <input type="file" name="image" accept="image/*"
+             class="w-full border rounded-md p-2 file:mr-3 file:py-1 file:px-3 file:rounded-md file:border-0 file:bg-brand file:text-white hover:file:bg-brand-dark">
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium mb-1">Link de vídeo (opcional)</label>
+      {{ form.embed_url|add_class:"w-full border rounded-md p-2" }}
+      <p class="text-xs text-gray-500 mt-1">Apenas YouTube, Instagram ou Facebook.</p>
+    </div>
+
+    <div class="pt-2 flex items-center gap-2">
+      <button class="px-4 py-2 bg-brand text-white rounded-md hover:bg-brand-dark">Publicar</button>
+      <a href="{% url 'feed' %}" class="px-4 py-2 border rounded-md hover:bg-gray-50">Cancelar</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

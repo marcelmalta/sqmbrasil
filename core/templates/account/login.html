@@ -7,20 +7,48 @@
   <h1 class="text-2xl font-bold mb-4">Entrar</h1>
   <form method="post" action="{% url 'account_login' %}" class="space-y-4">
     {% csrf_token %}
-    {{ form.non_field_errors }}
+    
+    {% if form.non_field_errors %}
+      <div class="px-4 py-2 bg-red-50 border border-red-200 text-red-700 rounded-md text-sm">
+        {% for e in form.non_field_errors %}
+          <p>{{ e }}</p>
+        {% endfor %}
+      </div>
+    {% endif %}
+
     <div>
       <label class="block text-sm mb-1">E-mail</label>
       {{ form.login|add_class:"w-full rounded-md border px-3 py-2" }}
+      {% if form.login.errors %}
+        <ul class="mt-1 text-xs text-red-600">
+          {% for e in form.login.errors %}
+            <li>{{ e }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
     </div>
+
     <div>
       <label class="block text-sm mb-1">Senha</label>
       {{ form.password|add_class:"w-full rounded-md border px-3 py-2" }}
+      {% if form.password.errors %}
+        <ul class="mt-1 text-xs text-red-600">
+          {% for e in form.password.errors %}
+            <li>{{ e }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
     </div>
+
     <div class="flex justify-between text-sm">
       <a href="{% url 'account_reset_password' %}" class="text-brand hover:underline">Esqueci minha senha</a>
     </div>
-    <button type="submit" class="w-full rounded-md bg-brand text-white py-2 hover:bg-brand-dark">Entrar</button>
+
+    <button type="submit" class="w-full rounded-md bg-brand text-white py-2 hover:bg-brand-dark">
+      Entrar
+    </button>
   </form>
+
   <p class="mt-4 text-sm text-gray-600">Não tem conta?
     <a href="{% url 'account_signup' %}" class="text-brand hover:underline">Cadastre-se</a>
   </p>

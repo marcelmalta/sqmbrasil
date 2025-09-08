@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}Comunidade — SQM Brasil{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto">
+  <h1 class="text-2xl font-semibold mb-6">Comunidade</h1>
+  <p class="text-sm text-gray-600 mb-6">Encontre outros membros da comunidade e conheça suas histórias.</p>
+
+  {% if profiles %}
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      {% for profile in profiles %}
+        <div class="bg-white border rounded-xl p-5 hover:shadow-md transition">
+          <div class="flex items-center gap-4 mb-3">
+            <div class="h-14 w-14 rounded-full overflow-hidden border">
+              {% if profile.avatar %}
+                <img src="{{ profile.avatar.url }}" alt="{{ profile.user.username }}" class="h-full w-full object-cover">
+              {% else %}
+                <div class="h-full w-full flex items-center justify-center bg-gray-100 text-gray-400">?</div>
+              {% endif %}
+            </div>
+            <div>
+              <h2 class="text-lg font-semibold">
+                <a href="{% url 'profile' username=profile.user.username %}" class="hover:text-brand">
+                  {{ profile.user.get_full_name|default:profile.user.username }}
+                </a>
+              </h2>
+              <p class="text-xs text-gray-500">@{{ profile.user.username }}</p>
+            </div>
+          </div>
+          <p class="text-sm text-gray-600 line-clamp-3">
+            {{ profile.bio|default:"Este usuário ainda não adicionou uma bio." }}
+          </p>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="bg-white border rounded-xl p-6 text-center text-gray-600">
+      Ainda não há perfis cadastrados.
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

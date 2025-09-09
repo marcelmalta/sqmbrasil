@@ -1,0 +1,61 @@
+# =======================
+# Django / Python
+# =======================
+__pycache__/
+*.py[cod]
+*.so
+*.log
+*.pot
+*.pyc
+
+# Virtualenv
+venv/
+ENV/
+env/
+.venv/
+
+# Banco de dados local
+db.sqlite3
+
+# =======================
+# Configurações / Secrets
+# =======================
+.env
+*.env
+
+# =======================
+# IDEs e editores
+# =======================
+.vscode/
+.idea/
+*.swp
+*~
+
+# =======================
+# Arquivos estáticos e mídia
+# =======================
+staticfiles/
+media/
+core/static/core/avatars/.gitkeep
+
+# =======================
+# Cache / build
+# =======================
+*.egg-info/
+dist/
+build/
+.eggs/
+*.manifest
+*.spec
+*.tmp
+*.bak
+
+# =======================
+# Render / Deploy
+# =======================
+*.pid
+*.seed
+*.cover
+.coverage
+htmlcov/
+.pytest_cache/

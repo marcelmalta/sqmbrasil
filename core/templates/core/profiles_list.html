@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}Comunidade — SQM Brasil{% endblock %}
 
@@ -14,9 +15,9 @@
           <div class="flex items-center gap-4 mb-3">
             <div class="h-14 w-14 rounded-full overflow-hidden border">
               {% if profile.avatar %}
-                <img src="{{ profile.avatar.url }}" alt="{{ profile.user.username }}" class="h-full w-full object-cover">
+                <img src="{% static profile.avatar %}" alt="{{ profile.user.username }}" class="h-full w-full object-cover">
               {% else %}
-                <div class="h-full w-full flex items-center justify-center bg-gray-100 text-gray-400">?</div>
+                <img src="{% static 'core/avatars/avatar1.png' %}" alt="Avatar padrão" class="h-full w-full object-cover">
               {% endif %}
             </div>
             <div>

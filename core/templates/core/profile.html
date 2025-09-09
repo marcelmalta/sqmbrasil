@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load tz %}
+{% load tz static %}
 
 {% block title %}Perfil de {{ profile_user.username }} — SQM Brasil{% endblock %}
 
@@ -8,9 +8,9 @@
   <div class="bg-white border rounded-2xl p-6 mb-8 flex items-center gap-4">
     <div class="h-20 w-20 rounded-full overflow-hidden border">
       {% if profile_user.profile.avatar %}
-        <img src="{{ profile_user.profile.avatar.url }}" alt="Avatar" class="h-full w-full object-cover">
+        <img src="{% static profile_user.profile.avatar %}" alt="Avatar" class="h-full w-full object-cover">
       {% else %}
-        <div class="h-full w-full flex items-center justify-center bg-gray-100 text-gray-500">Sem foto</div>
+        <img src="{% static 'core/avatars/avatar1.png' %}" alt="Avatar" class="h-full w-full object-cover">
       {% endif %}
     </div>
     <div class="flex-1">
@@ -22,12 +22,8 @@
     {% endif %}
   </div>
 
-  {% if request.user == profile_user %}
-    <div class="mb-6">
-      <a href="{% url 'create_user_post' %}" class="px-4 py-2 bg-brand text-white rounded-md">Escrever nova postagem</a>
-      <span class="ml-2 text-sm text-gray-500">Lembrete: 1 postagem por dia</span>
-    </div>
-  {% endif %}
+  {# ... o restante do seu template atual pode permanecer igual ... #}
+  {# (lista de postagens, embeds, etc.) #}
 
   <h2 class="text-xl font-semibold mb-4">Postagens de {{ profile_user.username }}</h2>
   {% if user_posts %}
@@ -43,7 +39,7 @@
             {% endif %}
           </div>
           <div class="text-xs text-gray-500 mb-3">Publicado em {{ up.created_at|localtime|date:"d/m/Y H:i" }}</div>
-          
+
           {% if up.image %}
             <img src="{{ up.image.url }}" alt="{{ up.title }}" class="rounded-md border mb-3">
           {% endif %}

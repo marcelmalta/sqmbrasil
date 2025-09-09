@@ -2,12 +2,21 @@ from django import forms
 from urllib.parse import urlparse
 from django.contrib.auth.models import User
 
-from .models import Profile, UserPost
+from .models import Profile, UserPost, AVATAR_DEFAULT
+
+DEFAULT_AVATARS = [
+    "core/avatars/avatar1.png",
+    "core/avatars/avatar2.png",
+    "core/avatars/avatar3.png",
+    "core/avatars/avatar4.png",
+    "core/avatars/avatar5.png",
+    "core/avatars/avatar6.png",
+    "core/avatars/avatar7.png",
+    "core/avatars/avatar8.png",
+    "core/avatars/avatar9.png",
+]
 
 
-# =========================
-# Formulário de Perfil
-# =========================
 class ProfileForm(forms.ModelForm):
     username = forms.CharField(
         max_length=30,
@@ -19,9 +28,16 @@ class ProfileForm(forms.ModelForm):
         })
     )
 
+    avatar_choice = forms.ChoiceField(
+        label="Escolha seu avatar",
+        required=True,
+        choices=[(p, p.split("/")[-1].replace(".png", "").capitalize()) for p in DEFAULT_AVATARS],
+        widget=forms.RadioSelect
+    )
+
     class Meta:
         model = Profile
-        fields = ["avatar", "bio"]
+        fields = ["bio", "avatar"]  # avatar é setado via avatar_choice no save()
         widgets = {
             "bio": forms.Textarea(attrs={
                 "rows": 4,
@@ -35,6 +51,8 @@ class ProfileForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         if self.user:
             self.fields["username"].initial = self.user.username
+        current = self.instance.avatar or AVATAR_DEFAULT
+        self.fields["avatar_choice"].initial = current
 
     def clean_username(self):
         username = self.cleaned_data["username"]
@@ -44,7 +62,6 @@ class ProfileForm(forms.ModelForm):
             raise forms.ValidationError(
                 "O nome de usuário só pode conter letras, números, ponto (.), underline (_) e hífen (-)."
             )
-
         if len(username) < 3 or len(username) > 20:
             raise forms.ValidationError("O nome de usuário deve ter entre 3 e 20 caracteres.")
 
@@ -60,14 +77,12 @@ class ProfileForm(forms.ModelForm):
         if self.user:
             self.user.username = self.cleaned_data["username"]
             self.user.save()
+        profile.avatar = self.cleaned_data.get("avatar_choice") or AVATAR_DEFAULT
         if commit:
             profile.save()
         return profile
 
 
-# =========================
-# Formulário de Post do Usuário
-# =========================
 class UserPostForm(forms.ModelForm):
     class Meta:
         model = UserPost

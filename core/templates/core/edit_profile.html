@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load widget_tweaks %}
+{% load widget_tweaks static %}
 
 {% block title %}Editar perfil — SQM Brasil{% endblock %}
 
@@ -7,13 +7,12 @@
 <div class="max-w-2xl mx-auto bg-white border rounded-2xl p-6">
   <h1 class="text-2xl font-semibold mb-4">Editar perfil</h1>
 
-  <form method="post" enctype="multipart/form-data" class="space-y-4">
+  <form method="post" class="space-y-6">
     {% csrf_token %}
 
     <div>
-      <label class="block text-sm font-medium mb-1">Nome de usuário</label>
+      <label class="block text-sm font-medium mb-2">Nome de usuário</label>
       {{ form.username|add_class:"w-full border rounded-md p-2" }}
-      <p class="text-xs text-gray-500 mt-1">Use apenas letras, números, ponto (.), underline (_) e hífen (-). 3–20 caracteres.</p>
       {% if form.username.errors %}
         <ul class="mt-1 text-xs text-red-600">
           {% for e in form.username.errors %}
@@ -24,22 +23,33 @@
     </div>
 
     <div>
-      <label class="block text-sm font-medium mb-1">Foto de perfil</label>
-      <input type="file" name="avatar" accept="image/*"
-             class="w-full border rounded-md p-2 file:mr-3 file:py-1 file:px-3 file:rounded-md file:border-0 file:bg-brand file:text-white hover:file:bg-brand-dark">
+      <label class="block text-sm font-medium mb-2">Escolha seu avatar</label>
+
+      <div class="grid grid-cols-3 sm:grid-cols-3 gap-4">
+        {% for value, label in form.avatar_choice.field.choices %}
+          {% with is_checked=form.avatar_choice.value == value %}
+          <label class="cursor-pointer flex flex-col items-center gap-2 p-3 border rounded-lg hover:bg-gray-50 {% if is_checked %}ring-2 ring-brand{% endif %}">
+            <img src="{% static value %}" alt="{{ label }}" class="h-16 w-16 rounded-full border object-cover">
+            <input type="radio" name="{{ form.avatar_choice.name }}" value="{{ value }}" class="hidden" {% if is_checked %}checked{% endif %}>
+            <span class="text-xs text-gray-600">{{ label }}</span>
+          </label>
+          {% endwith %}
+        {% endfor %}
+      </div>
+
+      {% if form.avatar_choice.errors %}
+        <ul class="mt-1 text-xs text-red-600">
+          {% for e in form.avatar_choice.errors %}
+            <li>{{ e }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
     </div>
 
     <div>
       <label class="block text-sm font-medium mb-1">Bio</label>
       {{ form.bio|add_class:"w-full border rounded-md p-2" }}
       <p class="text-xs text-gray-500 mt-1">Dica: fale brevemente sobre sua experiência com SQM.</p>
-      {% if form.bio.errors %}
-        <ul class="mt-1 text-xs text-red-600">
-          {% for e in form.bio.errors %}
-            <li>{{ e }}</li>
-          {% endfor %}
-        </ul>
-      {% endif %}
     </div>
 
     <div class="pt-2">

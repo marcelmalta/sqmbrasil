@@ -2,11 +2,14 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    # Feed principal (posts oficiais + comunidade)
+    # Feed principal (posts oficiais + comunidade aprovada)
     path("", views.home, name="feed"),
 
-    # Detalhes de post oficial
+    # Detalhe de post oficial
     path("post/<slug:slug>/", views.post_detail, name="post_detail"),
+
+    # Ação de curtir/descurtir post oficial (POST)
+    path("post/<int:post_id>/like/", views.like_post, name="like_post"),
 
     # Perfis
     path("profile/edit/", views.edit_profile, name="edit_profile"),

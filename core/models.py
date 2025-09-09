@@ -1,12 +1,17 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+
+AVATAR_DEFAULT = "core/avatars/avatar1.png"
+
+
 # ========================
 # Perfis de usuário
 # ========================
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
-    avatar = models.ImageField(upload_to="avatars/", default="avatars/default.png")
+    # Agora armazenamos o CAMINHO ESTÁTICO do avatar (não é upload)
+    avatar = models.CharField(max_length=120, default=AVATAR_DEFAULT)
     bio = models.TextField(max_length=300, blank=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -43,9 +48,7 @@ class UserPost(models.Model):
     image = models.ImageField(upload_to="user_posts/", blank=True, null=True)
     embed_url = models.URLField("Link de vídeo (YouTube, Instagram, Facebook)", blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
-
-    # 🚨 novo campo
-    is_approved = models.BooleanField(default=False)
+    is_approved = models.BooleanField(default=False)  # aprovado pelo admin?
 
     class Meta:
         ordering = ["-created_at"]
@@ -64,7 +67,6 @@ class UserPost(models.Model):
         return self.embed_url and "facebook.com" in self.embed_url
 
     def youtube_embed(self):
-        """Transforma link do YouTube em embed se necessário"""
         if not self.embed_url:
             return None
         if "watch?v=" in self.embed_url:
@@ -73,7 +75,7 @@ class UserPost(models.Model):
 
 
 # ========================
-# Curtidas e comentários (já existiam)
+# Curtidas e comentários
 # ========================
 class Comment(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="comments")

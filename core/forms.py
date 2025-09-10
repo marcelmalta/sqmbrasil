@@ -1,9 +1,11 @@
 from django import forms
-from urllib.parse import urlparse
 from django.contrib.auth.models import User
-
 from .models import Profile, UserPost, AVATAR_DEFAULT
 
+
+# ========================
+# Avatares padrão
+# ========================
 DEFAULT_AVATARS = [
     "core/avatars/avatar1.png",
     "core/avatars/avatar2.png",
@@ -17,6 +19,9 @@ DEFAULT_AVATARS = [
 ]
 
 
+# ========================
+# Formulário de perfil
+# ========================
 class ProfileForm(forms.ModelForm):
     username = forms.CharField(
         max_length=30,
@@ -37,7 +42,7 @@ class ProfileForm(forms.ModelForm):
 
     class Meta:
         model = Profile
-        fields = ["bio", "avatar"]  # avatar é setado via avatar_choice no save()
+        fields = ["bio"]  # apenas bio aqui; avatar vem via avatar_choice
         widgets = {
             "bio": forms.Textarea(attrs={
                 "rows": 4,
@@ -49,8 +54,12 @@ class ProfileForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop("user", None)
         super().__init__(*args, **kwargs)
+
+        # Preenche o username do usuário logado
         if self.user:
             self.fields["username"].initial = self.user.username
+
+        # Preenche avatar atual ou default
         current = self.instance.avatar or AVATAR_DEFAULT
         self.fields["avatar_choice"].initial = current
 
@@ -74,59 +83,40 @@ class ProfileForm(forms.ModelForm):
 
     def save(self, commit=True):
         profile = super().save(commit=False)
+
+        # Atualiza username
         if self.user:
             self.user.username = self.cleaned_data["username"]
             self.user.save()
-        profile.avatar = self.cleaned_data.get("avatar_choice") or AVATAR_DEFAULT
+
+        # Atualiza avatar somente se veio do form
+        avatar_choice = self.cleaned_data.get("avatar_choice")
+        if avatar_choice:
+            profile.avatar = avatar_choice
+
         if commit:
             profile.save()
         return profile
 
 
+# ========================
+# Formulário de postagens de usuários
+# ========================
 class UserPostForm(forms.ModelForm):
     class Meta:
         model = UserPost
         fields = ["title", "content", "image", "embed_url"]
-        widgets = {
-            "title": forms.TextInput(attrs={
-                "placeholder": "Título do seu relato/artigo",
-                "class": "w-full border rounded-md p-3"
-            }),
-            "content": forms.Textarea(attrs={
-                "rows": 8,
-                "placeholder": "Escreva seu relato, artigo, depoimento ou notícia sobre SQM...",
-                "class": "w-full border rounded-md p-3"
-            }),
-            "embed_url": forms.URLInput(attrs={
-                "placeholder": "Cole um link de vídeo (YouTube, Instagram ou Facebook) — opcional",
-                "class": "w-full border rounded-md p-3"
-            }),
-        }
 
     def clean_embed_url(self):
-        url = self.cleaned_data.get("embed_url")
+        url = self.cleaned_data.get("embed_url", "").strip()
         if not url:
             return url
 
-        netloc = urlparse(url).netloc.lower()
-        allowed = (
-            "youtube.com", "youtu.be",
-            "instagram.com", "www.instagram.com",
-            "facebook.com", "www.facebook.com"
-        )
-        if not any(d in netloc for d in allowed):
-            raise forms.ValidationError("Apenas links de YouTube, Instagram ou Facebook são permitidos.")
-
-        # Conversão automática de YouTube
-        if "youtu.be/" in url:
-            video_id = url.split("youtu.be/")[-1].split("?")[0]
-            return f"https://www.youtube.com/embed/{video_id}"
-
-        if "watch?v=" in url:
+        # Converter link YouTube normal/short para embed
+        if "youtube.com/watch?v=" in url:
             video_id = url.split("watch?v=")[-1].split("&")[0]
             return f"https://www.youtube.com/embed/{video_id}"
-
-        if "youtube.com/embed/" in url:
-            return url  # já está no formato correto
-
+        elif "youtu.be/" in url:
+            video_id = url.split("youtu.be/")[-1].split("?")[0]
+            return f"https://www.youtube.com/embed/{video_id}"
         return url

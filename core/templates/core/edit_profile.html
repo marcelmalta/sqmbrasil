@@ -10,6 +10,12 @@
   <form method="post" class="space-y-6">
     {% csrf_token %}
 
+    {% if form.errors %}
+      <div class="p-3 mb-4 bg-red-100 text-red-700 rounded">
+        {{ form.errors }}
+      </div>
+    {% endif %}
+
     <div>
       <label class="block text-sm font-medium mb-2">Nome de usuário</label>
       {{ form.username|add_class:"w-full border rounded-md p-2" }}
@@ -29,7 +35,8 @@
         {% for value, label in form.avatar_choice.field.choices %}
           <label class="cursor-pointer flex flex-col items-center gap-2 p-3 border rounded-lg hover:bg-gray-50 {% if form.avatar_choice.value == value %}ring-2 ring-brand{% endif %}">
             <img src="{% static value %}" alt="{{ label }}" class="h-16 w-16 rounded-full border object-cover">
-            <input type="radio" name="{{ form.avatar_choice.name }}" value="{{ value }}" class="hidden" {% if form.avatar_choice.value == value %}checked{% endif %}>
+            <input type="radio" name="avatar_choice" value="{{ value }}" class="hidden"
+                   {% if form.avatar_choice.value == value %}checked{% endif %} required>
             <span class="text-xs text-gray-600">{{ label }}</span>
           </label>
         {% endfor %}

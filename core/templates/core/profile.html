@@ -96,4 +96,20 @@
 
             {% if request.user.is_authenticated %}
               <form method="post" action="{% url 'comment_user_post' up.id %}" class="mt-2">
-                {%
+                {% csrf_token %}
+                <textarea name="comment" rows="2" class="w-full border rounded-md p-2"
+                          placeholder="Escreva um comentário..."></textarea>
+                <button type="submit" class="mt-1 px-3 py-1 bg-brand text-white rounded-md">Comentar</button>
+              </form>
+            {% endif %}
+          </div>
+        </article>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="bg-white border rounded-xl p-6 text-center text-gray-600">
+      Ainda não há postagens.
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

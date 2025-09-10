@@ -4,6 +4,15 @@
 {% block title %}Editar perfil — SQM Brasil{% endblock %}
 
 {% block content %}
+<style>
+  /* Destaque visual para avatar selecionado */
+  label:has(input[type="radio"]:checked) {
+    outline: 2px solid #10b981; /* cor brand */
+    outline-offset: 2px;
+    border-radius: 0.75rem;
+  }
+</style>
+
 <div class="max-w-2xl mx-auto bg-white border rounded-2xl p-6">
   <h1 class="text-2xl font-semibold mb-4">Editar perfil</h1>
 
@@ -33,7 +42,7 @@
 
       <div class="grid grid-cols-3 sm:grid-cols-3 gap-4">
         {% for value, label in form.avatar_choice.field.choices %}
-          <label class="cursor-pointer flex flex-col items-center gap-2 p-3 border rounded-lg hover:bg-gray-50 {% if form.avatar_choice.value == value %}ring-2 ring-brand{% endif %}">
+          <label class="cursor-pointer flex flex-col items-center gap-2 p-3 border rounded-lg hover:bg-gray-50">
             <img src="{% static value %}" alt="{{ label }}" class="h-16 w-16 rounded-full border object-cover">
             <input type="radio" name="avatar_choice" value="{{ value }}" class="hidden"
                    {% if form.avatar_choice.value == value %}checked{% endif %} required>

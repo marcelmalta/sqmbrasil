@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     # django-allauth
     "allauth",
     "allauth.account",
-    "allauth.socialaccount",  # opcional
+    "allauth.socialaccount",
 
     # Storage externo (R2/S3)
     "storages",
@@ -60,7 +60,7 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
-    "allauth.account.middleware.AccountMiddleware",  # obrigatório para allauth
+    "allauth.account.middleware.AccountMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
@@ -70,7 +70,7 @@ ROOT_URLCONF = "sqmbrasil.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [BASE_DIR / "templates"],  # pasta global
+        "DIRS": [BASE_DIR / "templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -114,23 +114,24 @@ USE_I18N = True
 USE_TZ = True
 
 # =========================
-# Arquivos estáticos
+# Arquivos estáticos (CSS, JS, avatares)
 # =========================
 STATIC_URL = "/static/"
 STATICFILES_DIRS = [BASE_DIR / "static"]
-STATIC_ROOT = BASE_DIR / "staticfiles"  # usado no deploy (collectstatic)
+STATIC_ROOT = BASE_DIR / "staticfiles"  # usado no deploy
+
+# Avatares continuam em static/ (não vão para R2)
+# Exemplo: {% static 'core/avatars/avatar1.png' %}
 
 # =========================
-# Arquivos de mídia (Cloudflare R2 / local)
+# Arquivos de mídia (posts, user_posts)
 # =========================
 USE_S3 = os.environ.get("USE_S3") == "True"
 
 STORAGES = {
-    # Arquivos estáticos (admin, CSS, JS)
     "staticfiles": {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
-    # Arquivos de mídia (uploads de usuário)
     "default": {
         "BACKEND": (
             "storages.backends.s3boto3.S3Boto3Storage"
@@ -144,9 +145,15 @@ if USE_S3:
     AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID")
     AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY")
     AWS_STORAGE_BUCKET_NAME = os.environ.get("AWS_STORAGE_BUCKET_NAME")
-    AWS_S3_ENDPOINT_URL = os.environ.get("AWS_S3_ENDPOINT_URL")
-    AWS_S3_SIGNATURE_VERSION = "s3v4"  # obrigatório no Cloudflare R2
-    MEDIA_URL = "https://media.sqmbrasil.com.br/"
+    AWS_S3_ENDPOINT_URL = os.environ.get("AWS_S3_ENDPOINT_URL")  # ex.: https://<accountid>.r2.cloudflarestorage.com
+    AWS_S3_SIGNATURE_VERSION = "s3v4"
+
+    # Domínio CDN opcional (pode ser configurado no painel do Cloudflare)
+    MEDIA_CDN_DOMAIN = os.environ.get("MEDIA_CDN_DOMAIN")
+    if MEDIA_CDN_DOMAIN:
+        MEDIA_URL = f"https://{MEDIA_CDN_DOMAIN}/"
+    else:
+        MEDIA_URL = f"{AWS_S3_ENDPOINT_URL}/{AWS_STORAGE_BUCKET_NAME}/"
 else:
     MEDIA_URL = "/media/"
     MEDIA_ROOT = BASE_DIR / "media"
@@ -159,7 +166,6 @@ AUTHENTICATION_BACKENDS = [
     "allauth.account.auth_backends.AuthenticationBackend",
 ]
 
-# Configuração moderna do allauth
 ACCOUNT_LOGIN_METHODS = {"email"}  # login só por e-mail
 ACCOUNT_SIGNUP_FIELDS = ["email*", "username*", "password1*", "password2*"]
 ACCOUNT_UNIQUE_EMAIL = True
@@ -167,20 +173,19 @@ ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/"
+ACCOUNT_LOGOUT_ON_GET = True  # ✅ Logout sem tela intermediária, redireciona direto para home
 
 # =========================
 # Configuração de e-mail
 # =========================
 if DEBUG:
-    # Desenvolvimento: imprime e-mail no console
     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 else:
-    # Produção: SendGrid
     EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
     EMAIL_HOST = "smtp.sendgrid.net"
     EMAIL_PORT = 587
     EMAIL_USE_TLS = True
-    EMAIL_HOST_USER = "apikey"  # literal
+    EMAIL_HOST_USER = "apikey"
     EMAIL_HOST_PASSWORD = os.environ.get("SENDGRID_API_KEY")
     DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "adminntato@sqmbrasil.com.br")
 

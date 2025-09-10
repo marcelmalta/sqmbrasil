@@ -107,6 +107,7 @@ class UserPostForm(forms.ModelForm):
         url = self.cleaned_data.get("embed_url")
         if not url:
             return url
+
         netloc = urlparse(url).netloc.lower()
         allowed = (
             "youtube.com", "youtu.be",
@@ -115,4 +116,17 @@ class UserPostForm(forms.ModelForm):
         )
         if not any(d in netloc for d in allowed):
             raise forms.ValidationError("Apenas links de YouTube, Instagram ou Facebook são permitidos.")
+
+        # Conversão automática de YouTube
+        if "youtu.be/" in url:
+            video_id = url.split("youtu.be/")[-1].split("?")[0]
+            return f"https://www.youtube.com/embed/{video_id}"
+
+        if "watch?v=" in url:
+            video_id = url.split("watch?v=")[-1].split("&")[0]
+            return f"https://www.youtube.com/embed/{video_id}"
+
+        if "youtube.com/embed/" in url:
+            return url  # já está no formato correto
+
         return url

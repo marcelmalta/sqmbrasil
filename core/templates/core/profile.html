@@ -5,25 +5,26 @@
 
 {% block content %}
 <div class="max-w-4xl mx-auto">
-  <div class="bg-white border rounded-2xl p-6 mb-8 flex items-center gap-4">
-    <div class="h-20 w-20 rounded-full overflow-hidden border">
+  <div class="bg-white border rounded-2xl p-6 mb-8 flex flex-col sm:flex-row items-center sm:items-start gap-6">
+    <!-- Avatar -->
+    <div class="h-28 w-28 sm:h-32 sm:w-32 rounded-full overflow-hidden border flex-shrink-0">
       {% if profile_user.profile.avatar %}
         <img src="{% static profile_user.profile.avatar %}" alt="Avatar" class="h-full w-full object-cover">
       {% else %}
         <img src="{% static 'core/avatars/avatar1.png' %}" alt="Avatar" class="h-full w-full object-cover">
       {% endif %}
     </div>
-    <div class="flex-1">
+
+    <!-- Dados do usuário -->
+    <div class="flex-1 text-center sm:text-left">
       <h1 class="text-2xl font-bold">{{ profile_user.get_full_name|default:profile_user.username }}</h1>
       <p class="text-gray-600">{{ profile_user.profile.bio|default:"Sem bio informada." }}</p>
     </div>
+
     {% if request.user == profile_user %}
       <a href="{% url 'edit_profile' %}" class="px-4 py-2 border rounded-md hover:bg-gray-50">Editar perfil</a>
     {% endif %}
   </div>
-
-  {# ... o restante do seu template atual pode permanecer igual ... #}
-  {# (lista de postagens, embeds, etc.) #}
 
   <h2 class="text-xl font-semibold mb-4">Postagens de {{ profile_user.username }}</h2>
   {% if user_posts %}
@@ -51,7 +52,9 @@
               <div class="aspect-video">
                 <iframe class="w-full h-full rounded-md border"
                         src="{{ up.youtube_embed }}"
-                        frameborder="0" allowfullscreen></iframe>
+                        frameborder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowfullscreen></iframe>
               </div>
             {% elif up.is_instagram %}
               <blockquote class="instagram-media" data-instgrm-permalink="{{ up.embed_url }}"></blockquote>

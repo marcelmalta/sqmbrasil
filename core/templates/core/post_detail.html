@@ -25,16 +25,15 @@
       {{ post.content|linebreaks }}
     </div>
 
-    <!-- Ações: Curtir e Compartilhar -->
+    <!-- Curtir e Compartilhar -->
     <div class="mt-6 flex items-center gap-4">
       <form method="post" action="{% url 'like_post' post.id %}">
         {% csrf_token %}
         <button type="submit" class="px-3 py-1 rounded-md border {% if user_liked %}bg-red-500 text-white{% else %}hover:bg-gray-100{% endif %}">
-          ❤️ Curtir ({{ post.likes_count }})
+          ❤️ Curtir{% if likes_count %} ({{ likes_count }}){% endif %}
         </button>
       </form>
 
-      <!-- Compartilhar -->
       <div class="flex gap-2 text-sm">
         <a href="https://wa.me/?text={{ request.build_absolute_uri }}" target="_blank" class="text-green-600">WhatsApp</a>
         <a href="https://twitter.com/intent/tweet?url={{ request.build_absolute_uri }}" target="_blank" class="text-sky-500">Twitter</a>
@@ -44,7 +43,7 @@
 
     <!-- Comentários -->
     <section class="mt-10">
-      <h2 class="text-xl font-semibold mb-4">Comentários</h2>
+      <h2 class="text-xl font-semibold mb-4">Comentários ({{ comments_count }})</h2>
 
       {% if user.is_authenticated %}
         <form method="post" class="mb-6">
@@ -61,6 +60,42 @@
           <p class="text-sm text-gray-800"><strong>{{ c.user.username }}</strong> disse:</p>
           <p class="text-gray-700">{{ c.content }}</p>
           <span class="text-xs text-gray-500">{{ c.created_at|localtime|date:"d/m/Y H:i" }}</span>
+
+          <!-- Curtir/Responder -->
+          <div class="mt-1 flex items-center gap-4 text-sm text-gray-600">
+            <form method="post" action="{% url 'like_comment' c.id %}">
+              {% csrf_token %}
+              <button type="submit" class="hover:text-red-500">
+                ❤️ Curtir{% if c.likes.count %} ({{ c.likes.count }}){% endif %}
+              </button>
+            </form>
+
+            <button type="button" onclick="document.getElementById('reply-{{ c.id }}').classList.toggle('hidden')">
+              ↩️ Responder
+            </button>
+          </div>
+
+          <!-- Form resposta -->
+          <div id="reply-{{ c.id }}" class="hidden mt-2">
+            <form method="post" action="{% url 'reply_comment' c.id %}">
+              {% csrf_token %}
+              <textarea name="comment" rows="2" class="w-full border rounded-md p-2" placeholder="Escreva uma resposta..."></textarea>
+              <button type="submit" class="mt-1 px-3 py-1 bg-brand text-white rounded-md">Responder</button>
+            </form>
+          </div>
+
+          <!-- Respostas -->
+          {% if c.replies.all %}
+            <div class="ml-6 mt-2 space-y-2 border-l pl-3">
+              {% for r in c.replies.all %}
+                <div>
+                  <p class="text-sm"><strong>{{ r.user.username }}</strong> respondeu:</p>
+                  <p class="text-gray-700">{{ r.content }}</p>
+                  <span class="text-xs text-gray-500">{{ r.created_at|localtime|date:"d/m/Y H:i" }}</span>
+                </div>
+              {% endfor %}
+            </div>
+          {% endif %}
         </div>
       {% empty %}
         <p class="text-gray-500">Ainda não há comentários.</p>

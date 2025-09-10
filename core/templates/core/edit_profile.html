@@ -27,13 +27,11 @@
 
       <div class="grid grid-cols-3 sm:grid-cols-3 gap-4">
         {% for value, label in form.avatar_choice.field.choices %}
-          {% with is_checked=form.avatar_choice.value == value %}
-          <label class="cursor-pointer flex flex-col items-center gap-2 p-3 border rounded-lg hover:bg-gray-50 {% if is_checked %}ring-2 ring-brand{% endif %}">
+          <label class="cursor-pointer flex flex-col items-center gap-2 p-3 border rounded-lg hover:bg-gray-50 {% if form.avatar_choice.value == value %}ring-2 ring-brand{% endif %}">
             <img src="{% static value %}" alt="{{ label }}" class="h-16 w-16 rounded-full border object-cover">
-            <input type="radio" name="{{ form.avatar_choice.name }}" value="{{ value }}" class="hidden" {% if is_checked %}checked{% endif %}>
+            <input type="radio" name="{{ form.avatar_choice.name }}" value="{{ value }}" class="hidden" {% if form.avatar_choice.value == value %}checked{% endif %}>
             <span class="text-xs text-gray-600">{{ label }}</span>
           </label>
-          {% endwith %}
         {% endfor %}
       </div>
 

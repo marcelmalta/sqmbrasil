@@ -86,7 +86,7 @@ class UserPost(models.Model):
 
 
 # ========================
-# Comentários e Curtidas
+# Comentários e Curtidas (Posts oficiais)
 # ========================
 class Comment(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="comments")
@@ -121,3 +121,29 @@ class CommentLike(models.Model):
 
     def __str__(self):
         return f"{self.user.username} curtiu comentário {self.comment.id}"
+
+
+# ========================
+# Curtidas e Comentários (UserPost)
+# ========================
+class UserPostLike(models.Model):
+    post = models.ForeignKey("UserPost", on_delete=models.CASCADE, related_name="likes")
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ("post", "user")
+
+    def __str__(self):
+        return f"{self.user.username} curtiu {self.post.title}"
+
+
+class UserPostComment(models.Model):
+    post = models.ForeignKey("UserPost", on_delete=models.CASCADE, related_name="comments")
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    parent = models.ForeignKey("self", null=True, blank=True, on_delete=models.CASCADE, related_name="replies")
+
+    def __str__(self):
+        return f"Comentário de {self.user.username} em {self.post.title}"

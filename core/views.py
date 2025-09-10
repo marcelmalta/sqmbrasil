@@ -5,7 +5,10 @@ from django.contrib import messages
 from django.contrib.auth.models import User
 from django.utils.timezone import now
 
-from .models import Post, Comment, Like, Profile, UserPost, AVATAR_DEFAULT, CommentLike
+from .models import (
+    Post, Comment, Like, Profile, UserPost, AVATAR_DEFAULT, CommentLike,
+    UserPostLike, UserPostComment
+)
 from .forms import ProfileForm, UserPostForm
 
 
@@ -156,3 +159,27 @@ def create_user_post(request):
         form = UserPostForm()
 
     return render(request, "core/user_post_form.html", {"form": form})
+
+
+# =========================
+# Curtidas e comentários em UserPost
+# =========================
+@login_required
+@require_POST
+def like_user_post(request, post_id):
+    post = get_object_or_404(UserPost, id=post_id, is_approved=True)
+    like, created = UserPostLike.objects.get_or_create(post=post, user=request.user)
+    if not created:
+        like.delete()
+    return redirect("profile", username=post.user.username)
+
+
+@login_required
+@require_POST
+def comment_user_post(request, post_id):
+    post = get_object_or_404(UserPost, id=post_id, is_approved=True)
+    content = (request.POST.get("comment") or "").strip()
+    if content:
+        UserPostComment.objects.create(post=post, user=request.user, content=content)
+        messages.success(request, "Comentário publicado!")
+    return redirect("profile", username=post.user.username)

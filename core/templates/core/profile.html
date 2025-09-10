@@ -22,7 +22,10 @@
     </div>
 
     {% if request.user == profile_user %}
-      <a href="{% url 'edit_profile' %}" class="px-4 py-2 border rounded-md hover:bg-gray-50">Editar perfil</a>
+      <div class="flex gap-2">
+        <a href="{% url 'edit_profile' %}" class="px-4 py-2 border rounded-md hover:bg-gray-50">Editar perfil</a>
+        <a href="{% url 'create_user_post' %}" class="px-4 py-2 bg-brand text-white rounded-md hover:bg-brand-dark">➕ Nova postagem</a>
+      </div>
     {% endif %}
   </div>
 
@@ -67,11 +70,30 @@
               <a class="text-brand underline" href="{{ up.embed_url }}" target="_blank" rel="noopener">Ver vídeo</a>
             {% endif %}
           {% endif %}
-        </article>
-      {% endfor %}
-    </div>
-  {% else %}
-    <div class="bg-white border rounded-xl p-6 text-center text-gray-600">Ainda não há postagens.</div>
-  {% endif %}
-</div>
-{% endblock %}
+
+          <!-- Curtidas e comentários -->
+          <div class="mt-4 flex items-center gap-4 text-sm text-gray-600">
+            <form method="post" action="{% url 'like_user_post' up.id %}">
+              {% csrf_token %}
+              <button type="submit" class="hover:text-red-500">
+                ❤️ Curtir{% if up.likes.count %} ({{ up.likes.count }}){% endif %}
+              </button>
+            </form>
+            <span>💬 Comentários ({{ up.comments.count }})</span>
+          </div>
+
+          <!-- Lista de comentários -->
+          <div class="mt-3">
+            {% for c in up.comments.all %}
+              <div class="mb-2 border-b pb-1">
+                <p class="text-sm"><strong>{{ c.user.username }}</strong> disse:</p>
+                <p class="text-gray-700">{{ c.content }}</p>
+                <span class="text-xs text-gray-500">{{ c.created_at|localtime|date:"d/m/Y H:i" }}</span>
+              </div>
+            {% empty %}
+              <p class="text-xs text-gray-500">Nenhum comentário ainda.</p>
+            {% endfor %}
+
+            {% if request.user.is_authenticated %}
+              <form method="post" action="{% url 'comment_user_post' up.id %}" class="mt-2">
+                {%
